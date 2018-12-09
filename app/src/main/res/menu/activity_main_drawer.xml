@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_kanto"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/kanto" />
+        <item
+            android:id="@+id/nav_johto"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/johto" />
+        <item
+            android:id="@+id/nav_hoenn"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/hoenn" />
+        <item
+            android:id="@+id/nav_sinnoh"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/sinnoh" />
+        <item
+            android:id="@+id/nav_unova"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/unova" />
+        <item
+            android:id="@+id/nav_kalos"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/kalos" />
+        <item
+            android:id="@+id/nav_alola"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/alola" />
+    </group>
+
+</menu>
