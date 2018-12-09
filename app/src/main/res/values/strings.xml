@@ -20,7 +20,7 @@
 
     <string name="pokemon_placeholder">#000 missingno.</string>
     <string name="info">Info</string>
-    <string name="stats">Stats</string>
+    <string name="stats">Base Stats</string>
     <string name="moves">Moves</string>
     <string name="extra">Extra</string>
     <string name="box_placeholder">\n\n\n\n\n</string>

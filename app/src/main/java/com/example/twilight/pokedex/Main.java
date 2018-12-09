@@ -10,20 +10,34 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import me.sargunvohra.lib.pokekotlin.client.PokeApi;
 import me.sargunvohra.lib.pokekotlin.client.PokeApiClient;
+import me.sargunvohra.lib.pokekotlin.model.NamedApiResource;
 import me.sargunvohra.lib.pokekotlin.model.Pokemon;
 import me.sargunvohra.lib.pokekotlin.model.PokemonAbility;
 import me.sargunvohra.lib.pokekotlin.model.PokemonMove;
 import me.sargunvohra.lib.pokekotlin.model.PokemonStat;
+
 
 public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private PokeApi pokeApi = new PokeApiClient();
     private Pokemon currentPokemon = null;
+    private static final int MAX_POKEMON = 802;
+    private List<NamedApiResource> pokemonList;
+    private Map<String, Integer> pokemonLookup = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +58,18 @@ public class Main extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
+
+        //when rotating apparently onCreate gets called again soooooo we don't want to call API every time
+        if (pokemonList == null) {
+            System.out.println("I don't know how to cache please don't ban me");
+            pokemonList = pokeApi.getPokemonList(1, MAX_POKEMON).getResults();
+            for (NamedApiResource pokemon : pokemonList) {
+                pokemonLookup.put(pokemon.getName(), pokemon.getId());
+            }
+        }
     }
 
     @Override
@@ -87,27 +113,65 @@ public class Main extends AppCompatActivity
         try {
             TextView input = findViewById(R.id.editText);
             int number = Integer.parseInt(input.getText().toString().trim());
-            if (currentPokemon == null) {
-                currentPokemon = pokeApi.getPokemon(number);
-            } else {
-                if (number != currentPokemon.getId()) {
-                    currentPokemon = pokeApi.getPokemon(number);
-                }
+            if (number > 0 && number < MAX_POKEMON) {
+                updatePokemon(number);
             }
-            TextView nameBox = findViewById(R.id.pkmnName);
-            TextView infoBox = findViewById(R.id.infoBox);
-            TextView movesBox = findViewById(R.id.movesBox);
-            TextView statsBox = findViewById(R.id.statsBox);
-
-            String nameString = "#" + currentPokemon.getId() + " " + currentPokemon.getName();
-            nameBox.setText(nameString);
-            infoBox.setText(formatInfo());
-            statsBox.setText(formatStats());
-            movesBox.setText(formatMoves());
-
         } catch (Exception E) {
-            E.printStackTrace();
+            //must be a string and not a number
+            TextView input = findViewById(R.id.editText);
+            String name = input.getText().toString().trim().replace(" ", "-").toLowerCase();
+            if (pokemonLookup.containsKey(name)) {
+                updatePokemon(pokemonLookup.get(name));
+            } else {
+                Toast.makeText(this, "Pokemon not found", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    public void next(View view) {
+        if (currentPokemon != null) {
+            int number = currentPokemon.getId() + 1;
+            if (number > MAX_POKEMON) {
+                number = 1;
+            }
+            updatePokemon(number);
+        } else {
+            updatePokemon(1);
+        }
+    }
+
+    public void previous(View view) {
+        if (currentPokemon != null) {
+            int number = currentPokemon.getId() - 1;
+            if (number <= 0) {
+                number = MAX_POKEMON;
+            }
+            updatePokemon(number);
+        } else {
+            updatePokemon(MAX_POKEMON);
+        }
+    }
+
+    private void updatePokemon(int num) {
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+        if (currentPokemon == null || currentPokemon.getId() != num) {
+            currentPokemon = pokeApi.getPokemon(num);
+        }
+
+        ImageView pokemonImage = findViewById(R.id.pkmnImage);
+        TextView nameBox = findViewById(R.id.pkmnName);
+        TextView infoBox = findViewById(R.id.infoBox);
+        TextView movesBox = findViewById(R.id.movesBox);
+        TextView statsBox = findViewById(R.id.statsBox);
+
+        Picasso.get().load(currentPokemon.getSprites().getFrontDefault()).into(pokemonImage);
+        String nameString = "#" + currentPokemon.getId() + " " + currentPokemon.getName();
+        nameBox.setText(nameString);
+        infoBox.setText(formatInfo());
+        statsBox.setText(formatStats());
+        movesBox.setText(formatMoves());
+        progressBar.setVisibility(View.GONE);
     }
 
     private String formatInfo() {
@@ -117,14 +181,19 @@ public class Main extends AppCompatActivity
         int typeAmount = currentPokemon.getTypes().size();
         String types = currentPokemon.getTypes().get(0).getType().getName();
         if (typeAmount > 1) {
-            types += ", " + currentPokemon.getTypes().get(1).getType().getName();
+            types = currentPokemon.getTypes().get(1).getType().getName() + ",-" + types;
         }
         infoList += "Type: " + makeReadable(types) + "\n";
 
         //abilities
         infoList += "Abilities: ";
-        for (PokemonAbility ability : currentPokemon.getAbilities()) {
-            infoList += makeReadable(ability.getAbility().getName()) + ", ";
+        List<PokemonAbility> abilityList = currentPokemon.getAbilities();
+        for (int i = abilityList.size() - 1; i >= 0; i--) {
+            PokemonAbility ability = abilityList.get(i);
+            infoList += makeReadable(ability.getAbility().getName());
+            if (i != 0) {
+                infoList += ", ";
+            }
         }
         infoList += "\n";
 
@@ -136,20 +205,25 @@ public class Main extends AppCompatActivity
     }
 
     private String formatMoves() {
-        String moveList = "";
+        String moveString = "";
         for (PokemonMove move : currentPokemon.getMoves()) {
-            moveList += makeReadable(move.getMove().getName()) + "\n";
+            moveString += makeReadable(move.getMove().getName()) + "\n";
         }
-        return moveList;
+        return moveString;
 
     }
 
     private String formatStats() {
-        String statList = "";
-        for (PokemonStat stat : currentPokemon.getStats()) {
-            statList += makeReadable(stat.getStat().getName()) + ": " + stat.getBaseStat() + "\n";
+        String statString = "";
+        List<PokemonStat> statList = currentPokemon.getStats();
+        for (int i = statList.size() - 1; i >= 0; i--) {
+            PokemonStat stat = statList.get(i);
+            statString += makeReadable(stat.getStat().getName() + ": " + stat.getBaseStat());
+            if (i != 0) {
+                statString += "\n";
+            }
         }
-        return statList;
+        return statString;
 
     }
 

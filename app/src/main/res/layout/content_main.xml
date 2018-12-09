@@ -18,7 +18,7 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/enter_prompt"
-        android:inputType="textNoSuggestions"
+        android:inputType="text|textNoSuggestions"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:textColor="@color/colorAccent"
@@ -62,6 +62,19 @@
             android:orientation="vertical"
             android:visibility="visible">
 
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/scroller"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/scroller"
+                app:layout_constraintVertical_bias="0.0" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -70,18 +83,19 @@
                     android:id="@+id/previousButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/side_margin"
                     android:layout_marginLeft="@dimen/side_margin"
                     android:layout_marginTop="75dp"
+                    android:layout_marginEnd="25dp"
                     android:layout_marginRight="25dp"
                     android:layout_marginBottom="75dp"
                     android:layout_weight="1"
                     android:background="@color/darkForeground"
+                    android:onClick="previous"
                     android:text="@string/previous"
                     android:textAllCaps="false"
                     android:textColor="@color/colorAccent"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginStart="@dimen/side_margin" />
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/pkmnImage"
@@ -93,18 +107,19 @@
                     android:id="@+id/nextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="25dp"
                     android:layout_marginLeft="25dp"
                     android:layout_marginTop="75dp"
+                    android:layout_marginEnd="@dimen/side_margin"
                     android:layout_marginRight="@dimen/side_margin"
                     android:layout_marginBottom="75dp"
                     android:layout_weight="1"
                     android:background="@color/darkForeground"
+                    android:onClick="next"
                     android:text="@string/next"
                     android:textAllCaps="false"
                     android:textColor="@color/colorAccent"
-                    android:textStyle="bold"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginEnd="@dimen/side_margin" />
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
