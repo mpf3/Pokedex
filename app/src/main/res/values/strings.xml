@@ -5,7 +5,7 @@
     <string name="nav_header_title">Pokédex</string>
     <string name="nav_header_desc">Powered by PokéAPI</string>
 
-    <string name="kanto">Kanto (0 – 151)</string>
+    <string name="kanto">Kanto (1 – 151)</string>
     <string name="johto">"Johto (151 – 251)"</string>
     <string name="hoenn">Hoenn (252 – 386)"</string>
     <string name="sinnoh">Sinnoh (387 – 493)</string>
@@ -18,10 +18,9 @@
     <string name="next">Next</string>
     <string name="search">Search</string>
 
-    <string name="pokemon_placeholder">#000 missingno.</string>
+    <string name="pokemon_placeholder">#? missingno.</string>
     <string name="info">Info</string>
     <string name="stats">Base Stats</string>
     <string name="moves">Moves</string>
-    <string name="extra">Extra</string>
     <string name="box_placeholder">\n\n\n\n\n</string>
 </resources>

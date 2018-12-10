@@ -6,31 +6,31 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_kanto"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/one"
             android:title="@string/kanto" />
         <item
             android:id="@+id/nav_johto"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/two"
             android:title="@string/johto" />
         <item
             android:id="@+id/nav_hoenn"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/three"
             android:title="@string/hoenn" />
         <item
             android:id="@+id/nav_sinnoh"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/four"
             android:title="@string/sinnoh" />
         <item
             android:id="@+id/nav_unova"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/five"
             android:title="@string/unova" />
         <item
             android:id="@+id/nav_kalos"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/six"
             android:title="@string/kalos" />
         <item
             android:id="@+id/nav_alola"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/seven"
             android:title="@string/alola" />
     </group>
 

@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +35,6 @@ public class Main extends AppCompatActivity
     private PokeApi pokeApi = new PokeApiClient();
     private Pokemon currentPokemon = null;
     private static final int MAX_POKEMON = 802;
-    private List<NamedApiResource> pokemonList;
     private Map<String, Integer> pokemonLookup = new HashMap<>();
 
     @Override
@@ -58,18 +56,6 @@ public class Main extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
-
-        //when rotating apparently onCreate gets called again soooooo we don't want to call API every time
-        if (pokemonList == null) {
-            System.out.println("I don't know how to cache please don't ban me");
-            pokemonList = pokeApi.getPokemonList(1, MAX_POKEMON).getResults();
-            for (NamedApiResource pokemon : pokemonList) {
-                pokemonLookup.put(pokemon.getName(), pokemon.getId());
-            }
-        }
     }
 
     @Override
@@ -110,6 +96,14 @@ public class Main extends AppCompatActivity
     }
 
     public void apiCall(View view) {
+        //initially add all pokemon to Map so you can look them up by name. only do it once
+        if (pokemonLookup.isEmpty()) {
+            System.out.println("I don't know how to cache please don't ban me");
+            List<NamedApiResource> pokemonList = pokeApi.getPokemonSpeciesList(1, MAX_POKEMON).getResults();
+            for (NamedApiResource pokemon : pokemonList) {
+                pokemonLookup.put(pokemon.getName(), pokemon.getId());
+            }
+        }
         try {
             TextView input = findViewById(R.id.editText);
             int number = Integer.parseInt(input.getText().toString().trim());
@@ -153,8 +147,6 @@ public class Main extends AppCompatActivity
     }
 
     private void updatePokemon(int num) {
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.VISIBLE);
         if (currentPokemon == null || currentPokemon.getId() != num) {
             currentPokemon = pokeApi.getPokemon(num);
         }
@@ -171,7 +163,6 @@ public class Main extends AppCompatActivity
         infoBox.setText(formatInfo());
         statsBox.setText(formatStats());
         movesBox.setText(formatMoves());
-        progressBar.setVisibility(View.GONE);
     }
 
     private String formatInfo() {
@@ -197,6 +188,18 @@ public class Main extends AppCompatActivity
         }
         infoList += "\n";
 
+        //forms
+        List<NamedApiResource> forms = currentPokemon.getForms();
+        if (forms.size() > 1) {
+            infoList += "Forms: ";
+            for (int i = forms.size() - 1; i >= 0; i--) {
+                infoList += makeReadable(forms.get(i).getName());
+                if (i != 0) {
+                    infoList += ", ";
+                }
+            }
+            infoList += "\n";
+        }
         //height and weight, numbers are stored *10 so they don't store decimals
         infoList += "Height: " + currentPokemon.getHeight() / 10.0 + " m\n";
         infoList += "Weight: " + currentPokemon.getWeight() / 10.0 + " kg";
@@ -215,14 +218,17 @@ public class Main extends AppCompatActivity
 
     private String formatStats() {
         String statString = "";
+        int statTotal = 0;
         List<PokemonStat> statList = currentPokemon.getStats();
         for (int i = statList.size() - 1; i >= 0; i--) {
             PokemonStat stat = statList.get(i);
             statString += makeReadable(stat.getStat().getName() + ": " + stat.getBaseStat());
+            statTotal += stat.getBaseStat();
             if (i != 0) {
                 statString += "\n";
             }
         }
+        statString += "\nTotal: " + statTotal;
         return statString;
 
     }
